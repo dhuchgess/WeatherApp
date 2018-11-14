@@ -10,12 +10,12 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_margin="8dp"
         android:orientation="vertical">
+
         <android.support.v7.widget.CardView
             android:id="@+id/autoComplete_cardView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:cardCornerRadius="8dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardViewRadius"
             android:layout_gravity="center">
             <fragment
                 android:id="@+id/place_autocomplete_fragment"
@@ -24,18 +24,76 @@
                 android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment" />
         </android.support.v7.widget.CardView>
         <android.support.v7.widget.CardView
+            android:id="@+id/tempUnit_cardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardViewRadius"
+            android:layout_marginTop="4dp"
+            android:layout_gravity="center">
+
+            <RadioGroup
+                android:id="@+id/tempUnitToggle"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/pink_out_line"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:layout_marginTop="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginLeft="1dp"
+                    android:id="@+id/tempUnitSwitchC"
+                    android:background="@drawable/toggle_widget_background"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/celsiusSymbol"
+                    android:textColor="@android:color/white"
+                    android:tag="0"
+                    android:onClick="setTempUnit"/>
+
+                <RadioButton
+                    android:layout_marginRight="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:id="@+id/tempUnitSwitchF"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/toggle_widget_background"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/fahrenheitSymbol"
+                    android:textColor="@android:color/white"
+                    android:onClick="setTempUnit"
+                    android:tag="1"/>
+            </RadioGroup>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
             android:id="@+id/weather_cardView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_weight="3"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="@dimen/cardViewRadius"
             android:layout_gravity="center">
             <LinearLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_margin="8dp"
                 android:orientation="vertical">
+                <TextView
+                    android:id="@+id/placeTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
+                    />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -45,15 +103,13 @@
                         android:id="@+id/weatherIcon"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:src="@android:drawable/btn_dialog"/>
+                        android:layout_weight="1" />
                     <TextView
                         android:id="@+id/description"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:layout_weight="2"
-                        android:text="Haze"/>
+                        android:layout_weight="8"/>
             </LinearLayout>
                 <TextView
                     android:id="@+id/currTemp"
@@ -71,6 +127,88 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
             </LinearLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="@dimen/cardViewRadius"
+            android:layout_gravity="center">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:rowCount="2"
+                android:columnCount="2"
+                android:layout_margin="8dp">
+                <TextView
+                    android:layout_gravity="fill"
+                    android:text="Humidity"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_rowWeight="1"
+                    android:textAlignment="center"
+                    android:layout_columnWeight="1"/>
+                <TextView
+                    android:layout_gravity="fill"
+                    android:text="Pressure"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"/>
+                <TextView
+                    android:id="@+id/humidityTextView"
+                    android:layout_gravity="fill"
+                    android:textAlignment="center"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"/>
+                <TextView
+                    android:id="@+id/pressureTextView"
+                    android:layout_gravity="fill"
+                    android:layout_rowWeight="1"
+                    android:textAlignment="center"
+                    android:layout_columnWeight="1"/>
+            </GridLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="@dimen/cardViewRadius"
+            android:layout_gravity="center">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:rowCount="2"
+                android:columnCount="2"
+                android:layout_margin="8dp">
+                <TextView
+                    android:layout_gravity="fill"
+                    android:text="Sunrise"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_rowWeight="1"
+                    android:textAlignment="center"
+                    android:layout_columnWeight="1"/>
+                <TextView
+                    android:layout_gravity="fill"
+                    android:text="Sunset"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"/>
+                <TextView
+                    android:id="@+id/sunriseTextView"
+                    android:layout_gravity="fill"
+                    android:textAlignment="center"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"/>
+                <TextView
+                    android:id="@+id/sunsetTextView"
+                    android:layout_gravity="fill"
+                    android:layout_rowWeight="1"
+                    android:textAlignment="center"
+                    android:layout_columnWeight="1"/>
+            </GridLayout>
         </android.support.v7.widget.CardView>
     </LinearLayout>
 </ScrollView>
