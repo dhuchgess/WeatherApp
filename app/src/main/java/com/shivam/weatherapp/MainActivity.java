@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 String apiJSONData = "";
 private int tempUnitTracker = 0; // 0 for C, 1 for F (extracted from the radioButton via the setTempUnit method)
 private int maxTemp, minTemp, currTemp;
+private double lat, lon;
 private LruCache<String, Bitmap> mBitmapCache;
     private class OpenWeatherDataReceiver extends AsyncTask<String, Void, String>{
         String apiURL = "https://api.openweathermap.org/data/2.5/weather?";
@@ -176,7 +180,7 @@ private LruCache<String, Bitmap> mBitmapCache;
     }
 
     public void setTempUnit(View view){
-        if(!(((TextView) findViewById(R.id.currTemp)).getText().toString().isEmpty()) && !(view.getTag().toString().equals(tempUnitTracker))) {
+        if(!(((TextView) findViewById(R.id.currTemp)).getText().toString().isEmpty()) && Integer.parseInt(view.getTag().toString()) != tempUnitTracker) {
             tempUnitTracker = Integer.parseInt(view.getTag().toString());
             if(view.getTag().toString().equals("0")) {
                 currTemp = toCelsius(currTemp);
@@ -207,12 +211,37 @@ private LruCache<String, Bitmap> mBitmapCache;
 
         return tempUnitTracker == 0 ? getString(R.string.celsiusSymbol) : getString(R.string.fahrenheitSymbol);
     }
+
+    protected void fetchData(double lat, double lon){
+        OpenWeatherDataReceiver openWeatherDataReceiver = new OpenWeatherDataReceiver();
+        openWeatherDataReceiver.execute(String.valueOf(lat), String.valueOf(lon));
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        switch (item.getItemId()){
+            case R.id.menu_refresh:
+                fetchData(lat, lon);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-        double lat = sharedPreferences.getFloat("latitude", 0), lon = sharedPreferences.getFloat("longitude", 0);
+        lat = sharedPreferences.getFloat("latitude", 0);
+        lon = sharedPreferences.getFloat("longitude", 0);
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
             String cityName = geocoder.getFromLocation(lat, lon, 1).get(0).getLocality();
@@ -224,17 +253,15 @@ private LruCache<String, Bitmap> mBitmapCache;
         tempUnitTracker = sp.getInt("tempUnitTracker", 0);
         RadioGroup radioGroup = findViewById(R.id.tempUnitToggle);
         radioGroup.check(radioGroup.getChildAt(tempUnitTracker).getId());
-        OpenWeatherDataReceiver openWeatherDataReceiver = new OpenWeatherDataReceiver();
-        openWeatherDataReceiver.execute(String.valueOf(lat), String.valueOf(lon));
+        fetchData(lat, lon);
         PlaceAutocompleteFragment autocompleteFragment  = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {            @Override
             public void onPlaceSelected(Place place) {
                 apiJSONData = "";   // Setting it to an empty string, so that it wont be have previous location data
-                sharedPreferences.edit().putFloat("latitude", (float) place.getLatLng().latitude).apply();
-                sharedPreferences.edit().putFloat("longitude", (float) place.getLatLng().longitude).apply();
+                lat = place.getLatLng().latitude;
+                lon = place.getLatLng().longitude;
                 Log.i("locationFragment", place.getName().toString() + " : getting weather details");
-                OpenWeatherDataReceiver openWeatherDataReceiver = new OpenWeatherDataReceiver();
-                openWeatherDataReceiver.execute(Double.toString(place.getLatLng().latitude), Double.toString(place.getLatLng().longitude));
+                fetchData(lat, lon);
                 // Setting placeTextView
                 ((TextView) findViewById(R.id.placeTextView)).setText(place.getName());
             }
@@ -263,5 +290,7 @@ private LruCache<String, Bitmap> mBitmapCache;
         super.onPause();
         SharedPreferences sp = getSharedPreferences(getPackageName(), MODE_PRIVATE);
         sp.edit().putInt("tempUnitTracker", tempUnitTracker).apply();
+        sp.edit().putFloat("latitude", (float) lat).apply();
+        sp.edit().putFloat("longitude", (float) lon).apply();
     }
 }

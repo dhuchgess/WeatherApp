@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Shivam Weather App</string>
-    <string name="currTemp">Current Temp: %1$d %2$s</string>
+    <string name="app_name">Unnamed Weather App</string>
+    <string name="currTemp">%1$d %2$s</string>
     <string name="minTemp">Min: %1$d %2$s</string>
     <string name="maxTemp">Max: %1$d %2$s</string>
     <string name="celsiusSymbol">\u2103</string>
